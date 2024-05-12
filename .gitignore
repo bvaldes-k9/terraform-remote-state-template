@@ -1,0 +1,13 @@
+# .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Ignore any .tfvars files.
+*.tfvars
+
+# Crash log files
+crash.log
