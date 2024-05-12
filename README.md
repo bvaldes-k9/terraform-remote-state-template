@@ -3,7 +3,7 @@
 
 - Infrastructure template that creates S3 bucket and DynamoDB table, which we then transfer terraform state to said S3 bucket which will then host our remote state.
 
-### | [Installation](##Installation) | [Configuration](##Configuration) | [Usage](##Usage) | [Clean Up](##Clean_Up) | [Troubleshoot](##Troubleshoot)
+### | [Installation](#installation) | [Configuration](#configuration) | [Usage](#usage) | [Clean Up](#clean-up) | [Troubleshoot](#troubleshoot) |
 
 ![Terraform Remote state](https://github.com/bvaldes-sol/terraform-remote-state-template/assets/88116524/129ddd90-4064-4b39-8b3c-ce232666ada1)
 
