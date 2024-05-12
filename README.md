@@ -1,33 +1,33 @@
 # Terraform Remote State Template
-- ![Static Badge](https://img.shields.io/badge/Terraform-V1.8.0-%23844FBA?logo=terraform) ![Static Badge](https://img.shields.io/badge/AWS_CLI-V2.15.19-%23232F3E?logo=amazonaws)
+![Static Badge](https://img.shields.io/badge/Terraform-V1.8.0-%23844FBA?logo=terraform) ![Static Badge](https://img.shields.io/badge/AWS_CLI-V2.15.19-%23232F3E?logo=amazonaws)
 
-
-
-
-Infrastructure template to create S3 bucket and DynamoDB table to then transfer terraform state to remote state on bucket. 
+- Infrastructure template that creates S3 bucket and DynamoDB table, which we then transfer terraform state to said S3 bucket which will then host our remote state.
 
 
 - Picture
+## Who is this for?
 
+- This project is useful to AWS Terraform Admins or Devs looking to have a reusable template to quickly standup remote state infrastructure with more simplicity to add to their IAC infrastructure.
+- DynamoDB Table allows for multiple users to collab on the remote state but prevents more than one to issue  commands to protect the state file.
 
-# Installation
+## Installation
+- AWS IAM user with S3, DynamoDB Access permissions
 - AWS CLI
-- AWS IAM user with S3, dynamoDB Access permissions
 - Terraform
 
-## AWS
-AWS CLI setup
-
-• Setup is based on your machine's operating system please follow AWS documententation linked below as its the most up to date and fastest process o download/configure.
-- https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
-
-AWS IAM User 
+### AWS
+#### AWS IAM User 
 
 • Configure an IAM user with the Amazon S3 and DynamoDB Access.
 • Then ensure in your user creation the IAM has your programmatic access created too.
 
+#### AWS CLI setup
 
-## AWS Configurations
+• Setup is based on your machine's operating system please follow AWS documententation linked below as its the most up to date and fastest process o download/configure.
+- https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html
+
+
+### AWS Configurations
 
 • After creating your user that has programmatic access to with permissions to services you will be deploying on AWS, you head to your terminal and issue the cmd. 
 - `$ aws configure --profile insert-name-here`
@@ -35,21 +35,84 @@ AWS IAM User
 • Follow the prompts and fill in the data you have from your programmtic access.
 
 
-## Terraform
-Terraform CLI setup
+### Terraform
+#### Terraform CLI setup
 
 • Setup is based on your machine's operating system please follow Hashicorp documententation linked below as its the most up to date and fastest process o download/configure.
 - https://learn.hashicorp.com/tutorials/terraform/install-cli
 
 
 
-# Configuration
+## Configuration
 ### Terraform
 
 
+#### `variable.tf` resources
+
+The backend are the specifices to where you want the backend state. You'll notice in the file that it's considered description with "#" in front of the them. We want to deploy our host infrastructure first(The S3 bucket and Dynamo DB) then once that's done and applied, we come back here remove the "#" and use the "terraform init" cmd and the state will be moved to your specified bucket.
+
+PLEASE WAIT TO DEPLOY INFRASTRUCTURE FIRST BEFORE REMOVING "#"
+- backend "s3"
+    -      bucket          = "insert-bucket-name-from-bucket-name-variable"
+    -      key             = "file-folder-name-on-s3/terraform.tfstate"
+    -      region          = "aws-region-for-s3"
+    -      dynamodb_table  = "dynamo-name"
+    -      encrypt         = true
+
+- variable "provider_region"
+    -       default     = "aws-region"
 
 
-`variable.tf` resources
+The below number is set to 30 to help with keeping cost down change based on your needs for deletion window.
+- variable "kms_key_deletion_window"
+    -       default     = "30"
+
+- variable "kms_key_alias" 
+  -     default     = "kms-key-name"
+
+S3 bucket name here must match the provider section.
+- variable "s3_bucket_name" 
+  -     default     = "s3-bucket-name"
+
+Days before moving a version to long term storage glacier
+- variable "transition_noncurrent_days" 
+  -     default     = 7
+
+I recommend glacier storage for your price saving but change this on your use case.
+- variable "storage_class"
+  -     default     = "GLACIER"
+
+Specifies days noncurrent object versions expire.
+- variable "expiration_noncurrent_days" 
+  -     default     = 8
+
+Must Ensure this matches the provider section
+- variable "dynamodb_table_name" 
+  -     default     = "dynamo-name"
+
+Change the billing based on your use case and how often you change the terraform state.
+- variable "dynamodb_table_billing_mode"
+  -     default     = "PAY_PER_REQUEST"
+
+Do not change this or the DynamoDB table will fail, this prevents the multiple users of making changes to the state file at once.
+- variable "lock_key_id"
+  -     default     = "LockID"
+
+
+
+```console
+foo@bar:~$ terraform init
+
+foo@bar:~$ terraform fmt
+
+foo@bar:~$ terraform plan
+
+foo@bar:~$ terraform apply
+```
+Afterwards it may take some time for the infrastructure to be completed, once's it's done we can go back to our `variable.tf` and remove the "#" from our lines of code like the gif below.
+
+
+
 
 - `bucket = custom-bucket-name`
 
@@ -57,12 +120,13 @@ Terraform CLI setup
      - `change lifecycle = true`
      - `prevent_destroy = true`
 
-`provider.tf` resources
+## Usage
+- Now that we're setup, ensure your at the file directory and run the following commands, if you get stuck seek my troubleshoot section.
 
 
 
 
-# Clean up
+## Clean up
 All done? 
 - Lets start with deleting the cluster with the cmd:
     - `$ kops delete cluster cluster-name --yes`
@@ -72,7 +136,7 @@ All done?
 - After kops delete and records is completed you can head out of ansible/ and now towards terraform/, to clean up terraform issue the destroy command 
 - `$ terraform destory -auto-approve`
 
-# Troubleshoot
+## Troubleshoot
 • Beware if you redeploy and make too many changes to your domain's name servers you may have to either flush your DNS or change your local DNS server to such as 8.8.8.8, 1.1.1.1, etc.
 A good way to test if your issue is the above is two options
 - Use the cmd: 
