@@ -111,7 +111,7 @@ foo@bar:~$ terraform apply
 ```
 Afterwards it may take some time for the infrastructure to be completed, once's it's done we can go back to our `variable.tf` and remove the "#" from our lines of code like the gif below.
 
-
+![comment-out-backend](https://github.com/bvaldes-sol/terraform-remote-state-template/assets/88116524/aa468d1e-6ab2-4c3d-9403-e9c7c9695007)
 
 
 - `bucket = custom-bucket-name`
