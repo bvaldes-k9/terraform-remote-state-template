@@ -1,5 +1,8 @@
-# terraform-remote-state-template
-- Badges
+# Terraform Remote State Template
+- ![Static Badge](https://img.shields.io/badge/Terraform-V1.8.0-%23844FBA?logo=terraform) ![Static Badge](https://img.shields.io/badge/AWS_CLI-V2.15.19-%23232F3E?logo=amazonaws)
+
+
+
 
 Infrastructure template to create S3 bucket and DynamoDB table to then transfer terraform state to remote state on bucket. 
 
