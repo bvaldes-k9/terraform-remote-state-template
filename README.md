@@ -111,6 +111,8 @@ foo@bar:~$ terraform init
 
 foo@bar:~$ terraform fmt
 
+foo@bar:~$ terraform validate
+
 foo@bar:~$ terraform plan
 
 foo@bar:~$ terraform apply
